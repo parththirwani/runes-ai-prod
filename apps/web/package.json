@@ -12,13 +12,20 @@
   },
   "dependencies": {
     "@repo/ui": "*",
+    "@types/file-saver": "^2.0.7",
+    "file-saver": "^2.0.5",
+    "lucide-react": "^0.562.0",
     "next": "16.1.0",
+    "next-auth": "^4.24.13",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
+    "@repo/lib": "*",
+    "@repo/types": "*",
+    "@repo/db": "*",
     "@types/node": "^22.15.3",
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",
