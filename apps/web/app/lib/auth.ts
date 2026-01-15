@@ -1,28 +1,19 @@
-// app/lib/auth.ts
-import NextAuth from "next-auth";
-import Google from "next-auth/providers/google";
 import { prisma } from "@repo/db/index";
+import NextAuth, { type DefaultSession } from "next-auth";
+import type { NextAuthResult } from "next-auth";
+import Google from "next-auth/providers/google";
 
 // ── Type augmentations ──────────────────────────────────────────────
 declare module "next-auth" {
   interface Session {
     user: {
       id: string;
-      name?: string | null;
-      email?: string | null;
-      image?: string | null;
-    };
+    } & DefaultSession["user"];
   }
 }
 
-declare module "next-auth/jwt" {
-  interface JWT {
-    id?: string;
-  }
-}
-
-// ── Export the NextAuth instance ───────────────────────────────────
-export const { handlers, auth, signIn, signOut } = NextAuth({
+// ── Create NextAuth instance ────────────────────────────────────────
+const nextAuth = NextAuth({
   providers: [
     Google({
       clientId: process.env.AUTH_GOOGLE_ID!,
@@ -30,45 +21,69 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async signIn({ user }) {
-      if (!user.email) return false;
-
+    async signIn({ user, profile }) {
       try {
+        // Check if user exists in database
         const existingUser = await prisma.user.findUnique({
-          where: { email: user.email },
+          where: { email: user.email! },
         });
 
         if (!existingUser) {
           await prisma.user.create({
             data: {
-              email: user.email,
-              image: user.image ?? null,
+              email: user.email!,
+              firstName: (profile?.given_name as string) || null,
+              lastName: (profile?.family_name as string) || null,
+              image: user.image || null,
             },
           });
-        } else if (user.image && user.image !== existingUser.image) {
+        } else {
           await prisma.user.update({
-            where: { email: user.email },
-            data: { image: user.image },
+            where: { email: user.email! },
+            data: {
+              firstName: (profile?.given_name as string) || existingUser.firstName,
+              lastName: (profile?.family_name as string) || existingUser.lastName,
+              image: user.image || existingUser.image,
+            },
           });
         }
-
         return true;
       } catch (error) {
-        console.error("[SIGN_IN_ERROR]", error);
+        console.error("[SIGNIN_ERROR]", error);
         return false;
       }
     },
     async jwt({ token, user }) {
-      if (user?.id) token.id = user.id;
+      if (user) {
+        token.id = user.id;
+      }
+      if (!token.id && token.email) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: token.email },
+        });
+        if (dbUser) {
+          token.id = dbUser.id;
+        }
+      }
       return token;
     },
     async session({ session, token }) {
-      if (session.user && token.id) {
-        session.user.id = token.id as string;
+      if (session.user) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: session.user.email! },
+        });
+        if (dbUser) {
+          session.user.id = dbUser.id;
+        }
       }
       return session;
     },
   },
   secret: process.env.AUTH_SECRET!,
-  debug: process.env.NODE_ENV === "development",
 });
+
+// ── Explicitly typed exports ────────────────────────────────────────
+export const handlers: NextAuthResult["handlers"] = nextAuth.handlers;
+export const auth: NextAuthResult["auth"] = nextAuth.auth;
+export const signIn: NextAuthResult["signIn"] = nextAuth.signIn;
+export const signOut: NextAuthResult["signOut"] = nextAuth.signOut;
