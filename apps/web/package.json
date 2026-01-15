@@ -21,15 +21,18 @@
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@repo/db": "*",
     "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
     "@repo/lib": "*",
     "@repo/types": "*",
-    "@repo/db": "*",
+    "@repo/typescript-config": "*",
     "@types/node": "^22.15.3",
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",
+    "autoprefixer": "^10.4.23",
     "eslint": "^9.39.1",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18",
     "typescript": "5.9.2"
   }
 }
