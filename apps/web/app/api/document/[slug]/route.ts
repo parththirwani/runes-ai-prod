@@ -1,10 +1,10 @@
 
 import { NextResponse } from "next/server";
-import { withAuth } from "../../../utils/auth/withAuth";
+import { withAuth } from "../../../utils/authentication/withAuth";
 import {updateDocumentSchema, documentSchema} from "@repo/types/documentSchema"
 import {validateLatexContent} from "@repo/lib/latex"
 import {compileLatexToPDF} from "@repo/lib/latex"
-import { prisma } from "@repo/db/prisma";
+import { prisma } from "@repo/db/index";
 
 export const GET = withAuth(async (req, session, context) => {
   try {

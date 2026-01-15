@@ -12,7 +12,7 @@
  */
 
 import * as runtime from "@prisma/client/runtime/client"
-import type * as Prisma from "./prismaNamespace.js"
+import type * as Prisma from "./prismaNamespace.ts"
 
 
 const config: runtime.GetPrismaClientConfig = {
@@ -20,7 +20,7 @@ const config: runtime.GetPrismaClientConfig = {
   "clientVersion": "7.2.0",
   "engineVersion": "0c8ef2ce45c83248ab3df073180d5eda9e8be7a3",
   "activeProvider": "postgresql",
-  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel User {\n  id        String   @id @default(uuid())\n  email     String   @unique\n  firstName String?\n  lastName  String?\n  image     String? // For avatar (e.g., from Google OAuth)\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  documents Document[]\n\n  @@map(\"users\")\n}\n\nmodel Document {\n  id      String @id @default(uuid())\n  title   String @unique\n  content String @db.Text // LaTeX source code\n  slug    String @unique\n  userId  String\n  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@unique([userId, title])\n  @@index([userId])\n  @@map(\"documents\")\n}\n",
+  "inlineSchema": "generator client {\n  provider               = \"prisma-client\"\n  output                 = \"../src/generated/prisma\"\n  generatedFileExtension = \"ts\"\n  importFileExtension    = \"ts\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel User {\n  id        String   @id @default(uuid())\n  email     String   @unique\n  firstName String?\n  lastName  String?\n  image     String? // For avatar (e.g., from Google OAuth)\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  documents Document[]\n\n  @@map(\"users\")\n}\n\nmodel Document {\n  id      String @id @default(uuid())\n  title   String @unique\n  content String @db.Text // LaTeX source code\n  slug    String @unique\n  userId  String\n  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@unique([userId, title])\n  @@index([userId])\n  @@map(\"documents\")\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},

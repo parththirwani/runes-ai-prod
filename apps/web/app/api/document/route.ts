@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { withAuth } from "../../utils/auth/withAuth";
+import { withAuth } from "../../utils/authentication/withAuth";
 import { documentSchema } from "@repo/types/documentSchema";
-import { prisma } from "@repo/db/prisma";
 import {generateSlug} from "@repo/lib/slug"
+import { prisma } from "@repo/db/index";
 
 export const POST = withAuth(async (req, session) => {
   try {

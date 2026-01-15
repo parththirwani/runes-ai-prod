@@ -1,4 +1,4 @@
-import { signIn } from "../utils/auth/auth";
+import { signIn } from "../utils/authentication/auth";
 
 export default function SignInPage() {
   return (
